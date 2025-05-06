@@ -1,0 +1,75 @@
+package com.duty.dutyschedulerbackend.domain.member.controller
+
+import com.duty.dutyschedulerbackend.domain.auth.JwtProvider
+import com.duty.dutyschedulerbackend.domain.member.dto.LoginRequest
+import com.duty.dutyschedulerbackend.domain.member.service.MemberService
+import com.duty.dutyschedulerbackend.global.dto.Response
+import com.duty.dutyschedulerbackend.global.filter.Auth
+import com.duty.dutyschedulerbackend.global.filter.AuthType
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
+@RestController
+@RequestMapping("/api/v1/members")
+class MemberController(
+    private val memberService: MemberService,
+) {
+    @PostMapping("/login")
+    fun login(
+        response: HttpServletResponse,
+        @RequestBody loginRequest: LoginRequest
+    ): ResponseEntity<Response<Unit>> {
+        val jwt = memberService.login(
+            id = loginRequest.id,
+            password = loginRequest.password,
+        )
+        val accessTokenCookie = Cookie(
+            "ACCESS_TOKEN",
+            URLEncoder.encode(jwt.accessToken, StandardCharsets.UTF_8)
+        )
+        accessTokenCookie.maxAge = JwtProvider.ACCESS_TOKEN_VALIDITY_TIME.toInt()
+//        accessTokenCookie.isHttpOnly = true
+        accessTokenCookie.path = "/"
+
+        val refreshTokenCookie = Cookie(
+            "REFRESH_TOKEN",
+            URLEncoder.encode(jwt.refreshToken, StandardCharsets.UTF_8)
+        )
+        refreshTokenCookie.maxAge = JwtProvider.REFRESH_TOKEN_VALIDITY_TIME.toInt()
+//        refreshTokenCookie.isHttpOnly = true
+        refreshTokenCookie.path = "/"
+
+        response.addCookie(accessTokenCookie)
+        response.addCookie(refreshTokenCookie)
+
+        return ResponseEntity
+            .status(200)
+            .body(
+                Response(
+                    status = 200,
+                    message = "Successfully logged in",
+                )
+            )
+    }
+
+    @GetMapping("/test")
+    @Auth(AuthType.MEMBER)
+    fun test(
+        request: HttpServletRequest,
+    ): ResponseEntity<Response<Unit>> {
+        request.getAttribute("memberId")?.let { memberId -> println(memberId) }
+        return ResponseEntity.ok(Response(
+            status = 200,
+            message = "Successfully test",
+        ))
+    }
+}
