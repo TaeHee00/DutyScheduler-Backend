@@ -37,7 +37,7 @@ class MemberController(
             URLEncoder.encode(jwt.accessToken, StandardCharsets.UTF_8)
         )
         accessTokenCookie.maxAge = JwtProvider.ACCESS_TOKEN_VALIDITY_TIME.toInt()
-//        accessTokenCookie.isHttpOnly = true
+        accessTokenCookie.isHttpOnly = false
         accessTokenCookie.path = "/"
 
         val refreshTokenCookie = Cookie(
@@ -45,7 +45,7 @@ class MemberController(
             URLEncoder.encode(jwt.refreshToken, StandardCharsets.UTF_8)
         )
         refreshTokenCookie.maxAge = JwtProvider.REFRESH_TOKEN_VALIDITY_TIME.toInt()
-//        refreshTokenCookie.isHttpOnly = true
+        refreshTokenCookie.isHttpOnly = false
         refreshTokenCookie.path = "/"
 
         response.addCookie(accessTokenCookie)

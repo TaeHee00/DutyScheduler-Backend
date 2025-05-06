@@ -18,4 +18,5 @@ enum class ErrorCode(
 
     // GROUP ERROR
     DUPLICATE_GROUP(HttpStatus.CONFLICT, "GROUP.001"),
+    ALREADY_JOINED_GROUP(HttpStatus.CONFLICT, "GROUP.002"),
 }
