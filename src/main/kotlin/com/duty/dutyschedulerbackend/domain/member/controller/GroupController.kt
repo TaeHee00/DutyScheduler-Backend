@@ -2,7 +2,6 @@ package com.duty.dutyschedulerbackend.domain.member.controller
 
 import com.duty.dutyschedulerbackend.domain.member.dto.CreateGroupRequest
 import com.duty.dutyschedulerbackend.domain.member.dto.GroupResponse
-import com.duty.dutyschedulerbackend.domain.member.dto.JoinGroupRequest
 import com.duty.dutyschedulerbackend.domain.member.service.GroupService
 import com.duty.dutyschedulerbackend.global.dto.Response
 import com.duty.dutyschedulerbackend.global.filter.Auth
@@ -52,25 +51,6 @@ class GroupController(
                 data = groupService.getGroupList(),
                 status = 200,
                 message = "Successfully retrieved groups",
-            )
-        )
-    }
-
-    @PostMapping("/join")
-    @Auth(AuthType.MEMBER)
-    fun joinGroup(
-        @RequestBody joinGroupRequest: JoinGroupRequest,
-    ) : ResponseEntity<Response<Unit>> {
-        groupService.joinGroup(
-            memberId = joinGroupRequest.memberId,
-            groupId = joinGroupRequest.groupId,
-        )
-
-        return ResponseEntity.ok(
-            Response(
-                data = Unit,
-                status = 200,
-                message = "Successfully joined group",
             )
         )
     }

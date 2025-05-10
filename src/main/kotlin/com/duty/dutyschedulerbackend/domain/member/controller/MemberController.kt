@@ -1,7 +1,9 @@
 package com.duty.dutyschedulerbackend.domain.member.controller
 
 import com.duty.dutyschedulerbackend.domain.auth.JwtProvider
+import com.duty.dutyschedulerbackend.domain.member.dto.EditMemberRequest
 import com.duty.dutyschedulerbackend.domain.member.dto.LoginRequest
+import com.duty.dutyschedulerbackend.domain.member.dto.MemberResponse
 import com.duty.dutyschedulerbackend.domain.member.service.MemberService
 import com.duty.dutyschedulerbackend.global.dto.Response
 import com.duty.dutyschedulerbackend.global.filter.Auth
@@ -12,11 +14,13 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.*
 
 @RestController
 @RequestMapping("/api/v1/members")
@@ -59,6 +63,37 @@ class MemberController(
                     message = "Successfully logged in",
                 )
             )
+    }
+
+    @PutMapping
+    @Auth(AuthType.MEMBER)
+    fun editMember(
+        @RequestBody editRequest: EditMemberRequest,
+    ): ResponseEntity<Response<Unit>> {
+        memberService.editMember(
+            memberId = editRequest.memberId!!,
+            memberName = editRequest.memberName,
+            groups = editRequest.groups,
+        )
+
+        return ResponseEntity.ok(
+            Response(
+                status = 200,
+                message = "Successfully edited member",
+            )
+        )
+    }
+
+    @GetMapping("/list")
+    @Auth(AuthType.MEMBER)
+    fun getMemberList(): ResponseEntity<Response<List<MemberResponse>>> {
+        return ResponseEntity.ok(
+            Response(
+                data = memberService.getMemberList(),
+                status = 200,
+                message = "Successfully found members"
+            )
+        )
     }
 
     @GetMapping("/test")
